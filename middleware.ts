@@ -5,8 +5,12 @@ export async function middleware(request: NextRequest) {
     const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
         request.nextUrl.pathname.startsWith('/register')
 
-    // Get session cookie from Better Auth
-    const sessionToken = request.cookies.get('better-auth.session_token')
+    // Better Auth can use different cookie names depending on configuration
+    // Check for common Better Auth cookie names
+    const sessionToken = request.cookies.get('better-auth.session_token') ||
+        request.cookies.get('better_auth_session') ||
+        request.cookies.get('session')
+
     const isLoggedIn = !!sessionToken
 
     // Redirect logged-in users away from auth pages

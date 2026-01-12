@@ -103,8 +103,11 @@ export default function RegisterPage() {
                 toast.success("Organization created successfully")
             }
 
-            router.push("/")
-            router.refresh()
+            // Wait a bit for cookies to be set properly
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            // Use window.location for a hard navigation to ensure middleware picks up the cookie
+            window.location.href = "/"
         } catch (error) {
             toast.error("Something went wrong")
         } finally {
