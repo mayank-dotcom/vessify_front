@@ -2,7 +2,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth"
 import {
     Table,
     TableBody,
@@ -24,7 +24,7 @@ interface TransactionTableProps {
 }
 
 export function TransactionTable({ refreshTrigger }: TransactionTableProps) {
-    const { data: session, isPending } = useSession()
+    const { data: session, loading } = useSession()
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -63,8 +63,8 @@ export function TransactionTable({ refreshTrigger }: TransactionTableProps) {
 
     // Initial load and refresh
     useEffect(() => {
-        // Only fetch if user is authenticated (not pending and session exists)
-        if (isPending || !session) {
+        // Only fetch if user is authenticated (not loading and session exists)
+        if (loading || !session) {
             setIsLoading(false)
             return
         }
@@ -88,7 +88,7 @@ export function TransactionTable({ refreshTrigger }: TransactionTableProps) {
             }
         }
         loadInitial()
-    }, [refreshTrigger, session, isPending])
+    }, [refreshTrigger, session, loading])
 
     const loadMore = async () => {
         if (!cursor) return

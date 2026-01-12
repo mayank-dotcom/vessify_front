@@ -2,7 +2,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { signOut, useSession } from "@/lib/auth-client"
+import { signOut, useSession } from "@/lib/auth"
 import {
     Avatar,
     AvatarFallback,
