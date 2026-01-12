@@ -1,8 +1,9 @@
 
 "use client"
 
-import { useState } from "react"
-import { useSession, useActiveOrganization } from "@/lib/auth-client"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useSession } from "@/lib/auth"
 import { TransactionParser } from "@/components/transaction-parser"
 import { TransactionTable } from "@/components/transaction-table"
 import { UserNav } from "@/components/user-nav"
@@ -10,13 +11,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, CreditCard, User } from "lucide-react"
 
 export default function Dashboard() {
-  const { data: session } = useSession()
-  const { data: activeOrg } = useActiveOrganization()
+  const router = useRouter()
+  const { data: session, loading } = useSession()
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // Client-side auth check
+  useEffect(() => {
+    if (!loading && !session) {
+      router.push('/login')
+    }
+  }, [session, loading, router])
 
   // Function to trigger table refresh after parsing
   const handleTransactionExtracted = () => {
     setRefreshTrigger(prev => prev + 1)
+  }
+
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center">Loading...</div>
+  }
+
+  if (!session) {
+    return null
   }
 
   return (
@@ -47,17 +63,6 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{session?.user?.name || "User"}</div>
               <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Organization</CardTitle>
-              <Building2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{activeOrg?.name || "No Organization"}</div>
-              <p className="text-xs text-muted-foreground">{activeOrg?.slug || "Create one to get started"}</p>
             </CardContent>
           </Card>
         </div>

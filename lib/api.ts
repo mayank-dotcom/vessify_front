@@ -8,17 +8,23 @@ export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}
     // Try to clean up URL
     const url = `${API_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`
 
+    // Get token from localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(options.headers as Record<string, string>),
     }
 
-    // Better Auth uses httpOnly cookies for session management
-    // We need to include credentials to send cookies with the request
+    // Add Authorization header if token exists
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`
+    }
+
     const response = await fetch(url, {
         ...options,
         headers,
-        credentials: 'include', // Important: This sends cookies with the request
+        credentials: 'include', // Keep for compatibility
     })
 
     // Check if response is JSON before parsing

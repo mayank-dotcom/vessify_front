@@ -59,57 +59,18 @@ export default function RegisterPage() {
         setIsLoading(true)
 
         try {
-            const { signUp, signIn } = await import("@/lib/auth-client")
+            const { signUp } = await import("@/lib/auth")
 
-            // 1. Register with Better Auth
-            const { data: signUpData, error: signUpError } = await signUp.email({
-                email: values.email,
-                password: values.password,
-                name: values.name,
-            })
-
-            if (signUpError) {
-                toast.error(signUpError.message || "Registration failed")
-                return
-            }
+            // Register and auto-login
+            await signUp(values.email, values.password, values.name)
 
             toast.success("Account created successfully")
 
-            // 2. Auto login with Better Auth
-            const { data: signInData, error: signInError } = await signIn.email({
-                email: values.email,
-                password: values.password,
-            })
-
-            if (signInError) {
-                toast.error("Login failed after registration. Please log in manually.")
-                router.push("/login")
-                return
-            }
-
-            // 3. Create Organization
-            const { organization } = await import("@/lib/auth-client")
-            const slug = values.organizationName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substring(2, 7)
-
-            const { data: orgData, error: orgError } = await organization.create({
-                name: values.organizationName,
-                slug: slug
-            })
-
-            if (orgError) {
-                console.error("Org creation error:", orgError)
-                toast.error("Account created but failed to create organization.")
-            } else {
-                toast.success("Organization created successfully")
-            }
-
-            // Wait a bit for cookies to be set properly
-            await new Promise(resolve => setTimeout(resolve, 500))
-
-            // Use window.location for a hard navigation to ensure middleware picks up the cookie
+            // TODO: Create organization after login
+            // For now, just redirect to dashboard
             window.location.href = "/"
         } catch (error) {
-            toast.error("Something went wrong")
+            toast.error(error instanceof Error ? error.message : "Something went wrong")
         } finally {
             setIsLoading(false)
         }

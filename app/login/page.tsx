@@ -46,29 +46,16 @@ export default function LoginPage() {
         setIsLoading(true)
 
         try {
-            const { signIn } = await import("@/lib/auth-client")
+            const { signIn } = await import("@/lib/auth")
 
-            const { data, error } = await signIn.email({
-                email: values.email,
-                password: values.password,
-            })
+            await signIn(values.email, values.password)
 
-            if (error) {
-                toast.error(error.message || "Invalid credentials")
-                return
-            }
+            toast.success("Logged in successfully")
 
-            if (data) {
-                toast.success("Logged in successfully")
-
-                // Wait a bit for cookies to be set properly
-                await new Promise(resolve => setTimeout(resolve, 500))
-
-                // Use window.location for a hard navigation to ensure middleware picks up the cookie
-                window.location.href = "/"
-            }
+            // Redirect to dashboard
+            window.location.href = "/"
         } catch (error) {
-            toast.error("Something went wrong")
+            toast.error(error instanceof Error ? error.message : "Something went wrong")
         } finally {
             setIsLoading(false)
         }
