@@ -1,4 +1,3 @@
-"use-back"
 "use client"
 
 import { useState } from "react"
@@ -9,7 +8,7 @@ import { Loader2, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { apiFetch } from "@/lib/api"
 import { ExtractResponse } from "@/types"
-import { organization } from "@/lib/auth-client"
+import { useActiveOrganization } from "@/lib/auth-client"
 
 interface TransactionParserProps {
     onTransactionExtracted: () => void
@@ -18,7 +17,7 @@ interface TransactionParserProps {
 export function TransactionParser({ onTransactionExtracted }: TransactionParserProps) {
     const [text, setText] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const { data: activeOrg } = organization.useActiveOrganization()
+    const { data: activeOrg } = useActiveOrganization()
 
     async function handleParse() {
         if (!text.trim()) {
